@@ -1,0 +1,18 @@
+include:
+  - project: cloud/ci/templates
+    ref: kamillaova/universal-templates
+    file:
+      - Docker.gitlab-ci.yml
+      - Helm.gitlab-ci.yml
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
+
+variables:
+  PUBLISH_ALL_BRANCHES: "true"
+  DOCKERFILE_DIR: build/scheduler
+  BUILD_ARGS: GO_BASE_IMAGE=golang:1.25.0
+  CHART_DIR: manifests/install/charts/as-a-second-scheduler
+  CHART_PRUNE: crds
