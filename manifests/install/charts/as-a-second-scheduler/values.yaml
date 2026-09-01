@@ -33,6 +33,15 @@ controller:
 # LoadVariationRiskBalancing and TargetLoadPacking are not enabled by default
 # as they need extra RBAC privileges on metrics.k8s.io.
 
+rbac:
+  # Grant the scheduler the DRA write verbs the in-tree DynamicResources plugin
+  # needs to allocate a claim at Reserve/PreBind: resourceclaims and their
+  # status and binding subresources, plus pods/finalizers. Required by any
+  # plugin that schedules DRA claims, CCXAlign among them. Off by default so a
+  # deployment running only Coscheduling or CapacityScheduling is not handed
+  # write access to every ResourceClaim in the cluster.
+  dra: false
+
 plugins:
   enabled: ["Coscheduling","CapacityScheduling","NodeResourceTopologyMatch","NodeResourcesAllocatable"]
   disabled: ["PrioritySort"] # only in-tree plugins need to be defined here
