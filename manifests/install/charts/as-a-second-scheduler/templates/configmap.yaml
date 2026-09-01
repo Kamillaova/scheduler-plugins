@@ -25,6 +25,24 @@ data:
           {{- range $.Values.plugins.disabled }}
           - name: {{ title . }}
           {{- end }}
+        {{- with $.Values.plugins.score }}
+        score:
+          {{- with .enabled }}
+          enabled:
+          {{- range . }}
+          - name: {{ .name }}
+            {{- if .weight }}
+            weight: {{ .weight }}
+            {{- end }}
+          {{- end }}
+          {{- end }}
+          {{- with .disabled }}
+          disabled:
+          {{- range . }}
+          - name: {{ .name }}
+          {{- end }}
+          {{- end }}
+        {{- end }}
       {{- if $.Values.pluginConfig }}
       pluginConfig: {{ toYaml $.Values.pluginConfig | nindent 6 }}
       {{- end }}
