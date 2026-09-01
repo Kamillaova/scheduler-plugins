@@ -14,6 +14,10 @@ scheduler:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  # Extra kube-scheduler CLI arguments. Feature gates live here: the
+  # KubeSchedulerConfiguration file has no featureGates field.
+  # e.g. ["--feature-gates=DRAConsumableCapacity=true"]
+  extraArgs: []
 
 controller:
   name: scheduler-plugins-controller
