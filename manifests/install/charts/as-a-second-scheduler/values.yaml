@@ -32,6 +32,10 @@ controller:
 plugins:
   enabled: ["Coscheduling","CapacityScheduling","NodeResourceTopologyMatch","NodeResourcesAllocatable"]
   disabled: ["PrioritySort"] # only in-tree plugins need to be defined here
+  # Per-plugin score weights; the multiPoint list above cannot express them.
+  # Names are used verbatim (no title-casing).
+  # e.g. score: {enabled: [{name: CCXAlign, weight: 5}], disabled: [{name: ImageLocality}]}
+  score: {}
 
 # Customize the enabled plugins' config.
 # Refer to the "pluginConfig" section of manifests/<plugin>/scheduler-config.yaml.
