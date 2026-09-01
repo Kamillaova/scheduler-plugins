@@ -20,6 +20,10 @@ scheduler:
   extraArgs: []
 
 controller:
+  # Serves the Coscheduling and ElasticQuota plugins, which need the
+  # scheduling.x-k8s.io CRDs. Turn off for a scheduler running neither, so the
+  # deployment does not require CRDs it never reads.
+  enabled: true
   name: scheduler-plugins-controller
   image: registry.k8s.io/scheduler-plugins/controller:v0.35.7
   replicaCount: 1
