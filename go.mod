@@ -146,7 +146,7 @@ require (
 	k8s.io/cloud-provider v0.37.0 // indirect
 	k8s.io/controller-manager v0.37.0 // indirect
 	k8s.io/csi-translation-lib v0.32.5 // indirect
-	k8s.io/dynamic-resource-allocation v0.37.0 // indirect
+	k8s.io/dynamic-resource-allocation v0.37.0
 	k8s.io/gengo/v2 v2.0.0-20260408192533-25e2208e0dc3 // indirect
 	k8s.io/kms v0.37.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20260721132016-d427ff9ee9ad // indirect

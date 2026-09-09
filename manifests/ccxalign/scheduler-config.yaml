@@ -1,0 +1,39 @@
+# Example KubeSchedulerConfiguration enabling CCXAlign as a second scheduler
+# for pods that opt in with schedulerName: dracpu-scheduler.
+#
+# The dra.cpu driver must run with publishFitAnnotation: true, and this
+# scheduler's Deployment must pass --feature-gates=DRAConsumableCapacity=true:
+# the gate is alpha here and the allocator refuses capacity-carrying claims
+# without it. Deploying through the as-a-second-scheduler chart also needs
+# rbac.dra=true, which grants the claim-writing verbs the in-tree
+# DynamicResources plugin uses to allocate at Reserve and PreBind.
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+leaderElection:
+  leaderElect: false
+profiles:
+  - schedulerName: dracpu-scheduler
+    plugins:
+      # CCXAlign has to be listed here, not only under score: each extension
+      # point is populated from its own list, and only multiPoint expands a
+      # name to all of them. Enabled under score alone the plugin registers as
+      # a scorer whose PreFilter never ran, so it reads no cycle state, scores
+      # every node the same, and its Reserve and Unreserve -- which keep a
+      # burst of pods from all choosing the node the first one just took --
+      # never run at all.
+      multiPoint:
+        enabled:
+          - name: CCXAlign
+      # The weight belongs here: multiPoint cannot express one, and an explicit
+      # Score weight takes precedence over the multiPoint default.
+      score:
+        enabled:
+          - name: CCXAlign
+            # Heavier than the default scorers, so the alignment tiers decide
+            # between feasible nodes and the defaults only break ties.
+            weight: 5
+        disabled:
+          # Their differentials on a heterogeneous fleet are larger than the
+          # within-tier damage signal; claim-bearing pods do not want either.
+          - name: ImageLocality
+          - name: PodTopologySpread
