@@ -173,7 +173,7 @@ type testContext struct {
 }
 
 func initTestSchedulerWithOptions(t *testing.T, testCtx *testContext, opts ...scheduler.Option) *testContext {
-	testCtx.InformerFactory = scheduler.NewInformerFactory(testCtx.ClientSet, 0)
+	testCtx.InformerFactory = scheduler.NewInformerFactory(testCtx.ClientSet, 0, nil)
 	if testCtx.KubeConfig != nil {
 		dynClient := dynamic.NewForConfigOrDie(testCtx.KubeConfig)
 		testCtx.DynInformerFactory = dynamicinformer.NewFilteredDynamicSharedInformerFactory(dynClient, 0, v1.NamespaceAll, nil)

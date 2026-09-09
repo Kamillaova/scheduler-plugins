@@ -66,6 +66,18 @@ func (f *testSharedLister) PodGroupStates() fwk.PodGroupStateLister {
 	return nil
 }
 
+func (f *testSharedLister) PodGroups() fwk.PodGroupLister {
+	return nil
+}
+
+func (f *testSharedLister) CompositePodGroupStates() fwk.CompositePodGroupStateLister {
+	return nil
+}
+
+func (f *testSharedLister) CompositePodGroups() fwk.CompositePodGroupLister {
+	return nil
+}
+
 func (f *testSharedLister) NodeInfos() fwk.NodeInfoLister {
 	return f
 }
@@ -79,6 +91,10 @@ func (f *testSharedLister) HavePodsWithAffinityList() ([]fwk.NodeInfo, error) {
 }
 
 func (f *testSharedLister) HavePodsWithRequiredAntiAffinityList() ([]fwk.NodeInfo, error) {
+	return nil, nil
+}
+
+func (f *testSharedLister) HavePodsWithRequiredNonHostScopedAntiAffinityList() ([]fwk.NodeInfo, error) {
 	return nil, nil
 }
 

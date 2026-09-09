@@ -29,7 +29,7 @@ import (
 //
 // PodGroup is a collection of Pod; used for batch workload.
 type PodGroupApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration `json:",inline"`
+	v1.TypeMetaApplyConfiguration `json:""`
 	// Standard object's metadata.
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// Specification of the desired behavior of the pod group.

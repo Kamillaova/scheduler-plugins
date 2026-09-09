@@ -23,6 +23,8 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/strategicpatch"
+	fwk "k8s.io/kube-scheduler/framework"
+	"k8s.io/kubernetes/pkg/scheduler/framework"
 
 	"sigs.k8s.io/scheduler-plugins/apis/scheduling/v1alpha1"
 )
@@ -73,4 +75,27 @@ func GetWaitTimeDuration(pg *v1alpha1.PodGroup, scheduleTimeout *time.Duration) 
 		return *scheduleTimeout
 	}
 	return DefaultWaitTime
+}
+
+func GetPodFromEntity(entity fwk.QueuedEntityInfo) *v1.Pod {
+	if entity == nil {
+		return nil
+	}
+	if pi, ok := entity.(interface{ GetPodInfo() fwk.PodInfo }); ok && pi.GetPodInfo() != nil {
+		return pi.GetPodInfo().GetPod()
+	}
+	if p, ok := entity.(interface{ GetPod() *v1.Pod }); ok {
+		return p.GetPod()
+	}
+	if qei, ok := entity.(framework.QueuedEntityInfo); ok {
+		var pod *v1.Pod
+		qei.ForEachPodInfo(func(pi *framework.QueuedPodInfo) bool {
+			if pi != nil {
+				pod = pi.GetPod()
+			}
+			return false
+		})
+		return pod
+	}
+	return nil
 }

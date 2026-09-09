@@ -25,9 +25,9 @@ import (
 // Interface provides access to all the informers in this group version.
 type Interface interface {
 	// ElasticQuotas returns a ElasticQuotaInformer.
-	ElasticQuotas() ElasticQuotaInformer
+	ElasticQuotas() TypedElasticQuotaInformer
 	// PodGroups returns a PodGroupInformer.
-	PodGroups() PodGroupInformer
+	PodGroups() TypedPodGroupInformer
 }
 
 type version struct {
@@ -41,12 +41,12 @@ func New(f internalinterfaces.SharedInformerFactory, namespace string, tweakList
 	return &version{factory: f, namespace: namespace, tweakListOptions: tweakListOptions}
 }
 
-// ElasticQuotas returns a ElasticQuotaInformer.
-func (v *version) ElasticQuotas() ElasticQuotaInformer {
+// ElasticQuotas returns a TypedElasticQuotaInformer.
+func (v *version) ElasticQuotas() TypedElasticQuotaInformer {
 	return &elasticQuotaInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }
 
-// PodGroups returns a PodGroupInformer.
-func (v *version) PodGroups() PodGroupInformer {
+// PodGroups returns a TypedPodGroupInformer.
+func (v *version) PodGroups() TypedPodGroupInformer {
 	return &podGroupInformer{factory: v.factory, namespace: v.namespace, tweakListOptions: v.tweakListOptions}
 }

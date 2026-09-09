@@ -99,9 +99,16 @@ func New(ctx context.Context, obj runtime.Object, handle fwk.Handle) (fwk.Plugin
 // Less is the function used by the activeQ heap algorithm to sort pods.
 // 1) Sort Pods based on their AppGroup and corresponding service topology graph.
 // 2) Otherwise, follow the strategy of the in-tree QueueSort Plugin (PrioritySort Plugin)
-func (ts *TopologicalSort) Less(pInfo1, pInfo2 fwk.QueuedPodInfo) bool {
-	p1AppGroup := networkawareutil.GetPodAppGroupLabel(pInfo1.GetPodInfo().GetPod())
-	p2AppGroup := networkawareutil.GetPodAppGroupLabel(pInfo2.GetPodInfo().GetPod())
+func (ts *TopologicalSort) Less(pInfo1, pInfo2 fwk.QueuedEntityInfo) bool {
+	pod1 := util.GetPodFromEntity(pInfo1)
+	pod2 := util.GetPodFromEntity(pInfo2)
+	if pod1 == nil || pod2 == nil {
+		s := &queuesort.PrioritySort{}
+		return s.Less(pInfo1, pInfo2)
+	}
+
+	p1AppGroup := networkawareutil.GetPodAppGroupLabel(pod1)
+	p2AppGroup := networkawareutil.GetPodAppGroupLabel(pod2)
 	ctx := context.TODO()
 	logger := ts.logger.WithValues("ExtensionPoint", "Less")
 
@@ -113,13 +120,13 @@ func (ts *TopologicalSort) Less(pInfo1, pInfo2 fwk.QueuedPodInfo) bool {
 	}
 
 	// Pods belong to the same appGroup, get the CR
-	logger.V(6).Info("Pods belong to the same AppGroup CR", "p1 name", pInfo1.GetPodInfo().GetPod().Name, "p2 name", pInfo2.GetPodInfo().GetPod().Name, "appGroup", p1AppGroup)
+	logger.V(6).Info("Pods belong to the same AppGroup CR", "p1 name", pod1.Name, "p2 name", pod2.Name, "appGroup", p1AppGroup)
 	agName := p1AppGroup
 	appGroup := ts.findAppGroupTopologicalSort(ctx, agName)
 
 	// Get labels from both pods
-	labelsP1 := pInfo1.GetPodInfo().GetPod().GetLabels()
-	labelsP2 := pInfo2.GetPodInfo().GetPod().GetLabels()
+	labelsP1 := pod1.GetLabels()
+	labelsP2 := pod2.GetLabels()
 
 	// Binary search to find both order index since topology list is ordered by Workload Name
 	orderP1 := networkawareutil.FindPodOrder(appGroup.Status.TopologyOrder, labelsP1[agv1alpha.AppGroupSelectorLabel])

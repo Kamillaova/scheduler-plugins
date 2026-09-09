@@ -191,6 +191,7 @@ func (pl *PreemptionToleration) SelectVictimsOnNode(
 	state fwk.CycleState,
 	preemptor *v1.Pod,
 	nodeInfo fwk.NodeInfo,
+	allPossibleVictims []*preemption.DomainVictim,
 	pdbs []*policy.PodDisruptionBudget) ([]*v1.Pod, int, *fwk.Status) {
 	var potentialVictims []fwk.PodInfo
 	logger := pl.logger

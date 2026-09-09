@@ -362,6 +362,18 @@ func (f *fakeSharedLister) PodGroupStates() fwk.PodGroupStateLister {
 	return nil
 }
 
+func (f *fakeSharedLister) PodGroups() fwk.PodGroupLister {
+	return nil
+}
+
+func (f *fakeSharedLister) CompositePodGroupStates() fwk.CompositePodGroupStateLister {
+	return nil
+}
+
+func (f *fakeSharedLister) CompositePodGroups() fwk.CompositePodGroupLister {
+	return nil
+}
+
 func (f *fakeSharedLister) NodeInfos() fwk.NodeInfoLister {
 	return tf.NodeInfoLister(f.nodes)
 }
