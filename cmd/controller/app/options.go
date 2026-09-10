@@ -27,6 +27,9 @@ type ServerRunOptions struct {
 	ApiServerBurst       int
 	Workers              int
 	EnableLeaderElection bool
+	EnableClaimProjector bool
+	DriverNamespace      string
+	DriverName           string
 }
 
 func NewServerRunOptions() *ServerRunOptions {
@@ -42,4 +45,7 @@ func (s *ServerRunOptions) addAllFlags() {
 	pflag.IntVar(&s.ApiServerBurst, "burst", 10, "burst of query apiserver.")
 	pflag.IntVar(&s.Workers, "workers", 1, "workers of scheduler-plugin-controllers.")
 	pflag.BoolVar(&s.EnableLeaderElection, "enableLeaderElection", s.EnableLeaderElection, "If EnableLeaderElection for controller.")
+	pflag.BoolVar(&s.EnableClaimProjector, "enableClaimProjector", s.EnableClaimProjector, "Enable claim projector reconciler.")
+	pflag.StringVar(&s.DriverNamespace, "driverNamespace", "default", "Namespace where driver runs and projected ConfigMaps are written.")
+	pflag.StringVar(&s.DriverName, "driverName", "dra.cpu", "ResourceSlice and allocation driver name to project claims for.")
 }
