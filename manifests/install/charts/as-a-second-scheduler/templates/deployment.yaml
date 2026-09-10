@@ -26,6 +26,17 @@ spec:
         {{- if .Values.controller.leaderElect }}
         - --enableLeaderElection
         {{- end }}
+        {{- if and .Values.controller.projector .Values.controller.projector.enabled }}
+        - --enableClaimProjector
+        {{- if .Values.controller.projector.driverNamespace }}
+        - --driverNamespace={{ .Values.controller.projector.driverNamespace }}
+        {{- else }}
+        - --driverNamespace={{ .Release.Namespace }}
+        {{- end }}
+        {{- if .Values.controller.projector.driverName }}
+        - --driverName={{ .Values.controller.projector.driverName }}
+        {{- end }}
+        {{- end }}
         image: {{ .Values.controller.image }}
         imagePullPolicy: IfNotPresent
         {{- with .Values.controller.resources }}
