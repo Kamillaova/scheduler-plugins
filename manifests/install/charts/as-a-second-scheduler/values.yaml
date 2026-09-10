@@ -33,6 +33,10 @@ controller:
   nodeSelector: {}
   affinity: {}
   tolerations: []
+  projector:
+    enabled: false
+    driverNamespace: ""
+    driverName: "dra.cpu"
 
 # LoadVariationRiskBalancing and TargetLoadPacking are not enabled by default
 # as they need extra RBAC privileges on metrics.k8s.io.
