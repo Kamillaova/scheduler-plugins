@@ -11,6 +11,7 @@ require (
 	github.com/google/go-cmp v0.7.0
 	github.com/k8stopologyawareschedwg/noderesourcetopology-api v0.1.2
 	github.com/k8stopologyawareschedwg/podfingerprint v0.2.2
+	github.com/kubernetes-sigs/dra-driver-cpu/api v0.0.0-20260910123321-c88b98daa976
 	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/paypal/load-watcher v0.2.4
 	github.com/spf13/pflag v1.0.10
@@ -146,7 +147,7 @@ require (
 	k8s.io/cloud-provider v0.37.0 // indirect
 	k8s.io/controller-manager v0.37.0 // indirect
 	k8s.io/csi-translation-lib v0.32.5 // indirect
-	k8s.io/dynamic-resource-allocation v0.37.0 // indirect
+	k8s.io/dynamic-resource-allocation v0.37.0
 	k8s.io/gengo/v2 v2.0.0-20260408192533-25e2208e0dc3 // indirect
 	k8s.io/kms v0.37.0 // indirect
 	k8s.io/kube-openapi v0.0.0-20260721132016-d427ff9ee9ad // indirect
@@ -199,3 +200,5 @@ replace k8s.io/externaljwt => k8s.io/externaljwt v0.37.0
 replace k8s.io/sample-cli-plugin => k8s.io/sample-cli-plugin v0.37.0
 
 replace k8s.io/sample-controller => k8s.io/sample-controller v0.37.0
+
+replace github.com/kubernetes-sigs/dra-driver-cpu/api => github.com/Kamillaova/dra-driver-cpu/api v0.0.0-20260910123321-c88b98daa976
