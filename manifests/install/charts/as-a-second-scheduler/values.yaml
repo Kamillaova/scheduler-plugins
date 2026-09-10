@@ -86,3 +86,13 @@ pluginConfig:
 #  args:
 #    defaultProfileNamespace: "default"
 #    defaultProfileName: "full-seccomp"
+
+# VM PriorityClass configuration.
+# When enabled, ships a PriorityClass configured with preemptionPolicy: Never
+# to protect VM workloads from being chosen as preemption victims while never
+# preempting other pods itself.
+priorityClass:
+  enabled: false
+  name: vm-priority
+  value: 100000000
+

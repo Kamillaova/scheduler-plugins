@@ -9,6 +9,7 @@
     - [Install chart using Helm v3.0+](#install-chart-using-helm-v30)
     - [Verify that scheduler and plugin-controller pod are running properly.](#verify-that-scheduler-and-plugin-controller-pod-are-running-properly)
   - [Configuration](#configuration)
+- [VM Eviction Protection](#vm-eviction-protection)
 <!-- /toc -->
 
 ## Installation
@@ -67,3 +68,26 @@ The following table lists the configurable parameters of the as-a-second-schedul
 | `plugins.enabled`              | Plugins enabled by default   | `["Coscheduling","CapacityScheduling","NodeResourceTopologyMatch", "NodeResourcesAllocatable"]` |
 | `plugins.disabled`             | Plugins disabled by default  | `["PrioritySort"]`                                                                              |
 | `percentageOfNodesToScore`     | Percentage of nodes to score | `null`                                                                                          |
+| `priorityClass.enabled`        | Deploy VM PriorityClass      | `false`                                                                                         |
+| `priorityClass.name`           | PriorityClass name           | `vm-priority`                                                                                   |
+| `priorityClass.value`          | PriorityClass value          | `100000000`                                                                                     |
+
+## VM Eviction Protection
+
+Virtual machine workloads require protection across multiple control-plane layers against involuntary preemption, eviction, and node drainage:
+
+1. **Scheduler Preemption**:
+   The chart can ship a dedicated `PriorityClass` with `preemptionPolicy: Never` (`priorityClass.enabled: true`). Configured with a priority value above ordinary workloads (e.g. `100000000`), VM pods are scheduled ahead of lower-priority pods and cannot be selected as preemption victims. Because `preemptionPolicy` is `Never`, VM pods also never preempt other pods.
+
+2. **Kubelet Node-Pressure Eviction (Quality of Service)**:
+   VM pods should mirror their total DRA claim capacities into pod-level `resources.requests` and `resources.limits` for both CPU and memory (`requests.cpu == limits.cpu` and `requests.memory == limits.memory`). This places the pod in the Kubernetes `Guaranteed` Quality-of-Service (QoS) tier, ensuring the kubelet assigns an `oom_score_adj` of -997. Under node memory or disk pressure, `Guaranteed` pods are evicted last, only after `BestEffort` and `Burstable` workloads, and only if the pod exceeds its own limits.
+
+3. **Voluntary Eviction, Node Drain, and Deschedulers**:
+   Each VM pod should be protected by a `PodDisruptionBudget` (PDB) specifying `maxUnavailable: 0` (or `minAvailable: 1`). Voluntary eviction operations (such as `kubectl drain` and descheduler evictions) respect PDBs and will not evict a running VM pod without explicit eviction handling or live migration.
+
+4. **Taint-Based Eviction on Node Problems**:
+   VM pods should declare tolerations for node problem condition taints without `tolerationSeconds`:
+   - `node.kubernetes.io/not-ready:Exists`
+   - `node.kubernetes.io/unreachable:Exists`
+   Omitting `tolerationSeconds` prevents the kubelet and taint-manager from evicting VM pods during transient node heartbeat delays or temporary network partitions.
+
