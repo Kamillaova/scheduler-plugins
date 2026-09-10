@@ -15,6 +15,10 @@ data:
     profiles:
     # Compose all plugins in one profile
     - schedulerName: {{ .Values.scheduler.name }}
+      {{- $percentageOfNodesToScore := default .Values.scheduler.percentageOfNodesToScore .Values.percentageOfNodesToScore }}
+      {{- if $percentageOfNodesToScore }}
+      percentageOfNodesToScore: {{ $percentageOfNodesToScore }}
+      {{- end }}
       plugins:
         multiPoint:
           enabled:
@@ -25,23 +29,36 @@ data:
           {{- range $.Values.plugins.disabled }}
           - name: {{ title . }}
           {{- end }}
-        {{- with $.Values.plugins.score }}
-        score:
+        {{- $extensionPoints := tuple "preEnqueue" "queueSort" "preFilter" "filter" "postFilter" "preScore" "score" "reserve" "permit" "preBind" "bind" "postBind" "placementGenerate" "placementScore" "podGroupPostFilter" }}
+        {{- range $ep := $extensionPoints }}
+        {{- with (index $.Values.plugins $ep) }}
+        {{- if or .enabled .disabled }}
+        {{ $ep }}:
           {{- with .enabled }}
           enabled:
           {{- range . }}
+          {{- if kindIs "map" . }}
           - name: {{ .name }}
             {{- if .weight }}
             weight: {{ .weight }}
             {{- end }}
+          {{- else }}
+          - name: {{ . }}
+          {{- end }}
           {{- end }}
           {{- end }}
           {{- with .disabled }}
           disabled:
           {{- range . }}
+          {{- if kindIs "map" . }}
           - name: {{ .name }}
+          {{- else }}
+          - name: {{ . }}
           {{- end }}
           {{- end }}
+          {{- end }}
+        {{- end }}
+        {{- end }}
         {{- end }}
       {{- if $.Values.pluginConfig }}
       pluginConfig: {{ toYaml $.Values.pluginConfig | nindent 6 }}
