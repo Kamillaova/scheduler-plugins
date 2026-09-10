@@ -50,6 +50,10 @@ rbac:
   # write access to every ResourceClaim in the cluster.
   dra: false
 
+# Percentage of nodes to score in the profile. When unset or null, kube-scheduler uses its default.
+# e.g. percentageOfNodesToScore: 100
+percentageOfNodesToScore: null
+
 plugins:
   enabled: ["Coscheduling","CapacityScheduling","NodeResourceTopologyMatch","NodeResourcesAllocatable"]
   disabled: ["PrioritySort"] # only in-tree plugins need to be defined here
@@ -57,6 +61,14 @@ plugins:
   # Names are used verbatim (no title-casing).
   # e.g. score: {enabled: [{name: CCXAlign, weight: 5}], disabled: [{name: ImageLocality}]}
   score: {}
+  # Per-extension-point plugin configuration.
+  # Any extension point (preEnqueue, queueSort, preFilter, filter, postFilter,
+  # preScore, score, reserve, permit, preBind, bind, postBind, placementGenerate,
+  # placementScore, podGroupPostFilter) can specify enabled and disabled lists.
+  # Names are used verbatim. In score, entries may also include an optional weight.
+  # e.g.
+  # postFilter: {disabled: [{name: DefaultPreemption}]}
+  # filter: {disabled: [{name: CCXAlign}]}
 
 # Customize the enabled plugins' config.
 # Refer to the "pluginConfig" section of manifests/<plugin>/scheduler-config.yaml.
