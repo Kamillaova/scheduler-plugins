@@ -66,3 +66,4 @@ The following table lists the configurable parameters of the as-a-second-schedul
 | `controller.tolerations`       | Controller tolerations       | `[]`                                                                                            |
 | `plugins.enabled`              | Plugins enabled by default   | `["Coscheduling","CapacityScheduling","NodeResourceTopologyMatch", "NodeResourcesAllocatable"]` |
 | `plugins.disabled`             | Plugins disabled by default  | `["PrioritySort"]`                                                                              |
+| `percentageOfNodesToScore`     | Percentage of nodes to score | `null`                                                                                          |
