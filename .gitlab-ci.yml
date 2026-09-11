@@ -1,0 +1,41 @@
+include:
+  - project: cloud/ci/templates
+    ref: kamillaova/universal-templates
+    file:
+      - Docker.gitlab-ci.yml
+      - Helm.gitlab-ci.yml
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_TAG
+    - if: $CI_COMMIT_BRANCH
+
+variables:
+  PUBLISH_ALL_BRANCHES: "true"
+  DOCKERFILE_DIR: build/scheduler
+  BUILD_ARGS: GO_BASE_IMAGE=golang:1.26.0
+  CHART_DIR: manifests/install/charts/as-a-second-scheduler
+  CHART_PRUNE: crds
+
+# The chart deploys two binaries from this repository and the template builds
+# one image per job, so the controller needs a job of its own. Without it the
+# only controller image available is upstream's, which has no claim projector,
+# and enabling the projector in values is unsatisfiable.
+controller:
+  extends: .docker-build
+  rules:
+    - if: $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_TAG
+    - if: $CI_COMMIT_REF_PROTECTED == "true" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $PUBLISH_ALL_BRANCHES == "true" && $CI_COMMIT_BRANCH
+    - when: never
+  variables:
+    IMAGE_NAME: $CI_PROJECT_PATH/controller
+    DOCKERFILE_DIR: build/controller
+  # The template reports IMAGE_DIGEST and IMAGE_REF through a dotenv artifact.
+  # Two jobs reporting the same keys leave a later stage reading whichever
+  # arrived last, so this one keeps the metadata and drops the report; its
+  # digest is in the job log and in metadata.json.
+  artifacts:
+    paths:
+      - metadata.json
+    expire_in: 7 days
