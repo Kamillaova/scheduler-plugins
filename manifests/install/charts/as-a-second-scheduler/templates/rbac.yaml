@@ -56,9 +56,34 @@ rules:
 - apiGroups: ["authorization.k8s.io"]
   resources: ["subjectaccessreviews"]
   verbs: ["create"]
+# kube-scheduler creates the ResourceClaim informer whenever
+# DynamicResourceAllocation is on, which it is by default, and waits for every
+# informer to sync before it schedules anything. Reading claims is therefore
+# not optional for any deployment of this chart, whatever plugins it runs.
 - apiGroups: ["resource.k8s.io"]
   resources: ["deviceclasses", "resourceclaims", "resourceslices"]
   verbs: ["get", "list", "watch"]
+{{- if .Values.rbac.dra }}
+# The in-tree DynamicResources plugin allocates claims at Reserve and PreBind,
+# which writes resourceclaims/status and the pod finalizer -- the same verbs
+# the bootstrap system:kube-scheduler role carries. Granted only when a plugin
+# here actually schedules DRA claims: a deployment running Coscheduling or
+# CapacityScheduling would otherwise be handed write access to every
+# ResourceClaim in the cluster for a feature it does not use.
+- apiGroups: ["resource.k8s.io"]
+  resources: ["resourceclaims", "resourceclaims/status"]
+  verbs: ["update", "patch"]
+# From 1.36 the apiserver marks status.allocation and status.reservedFor
+# NoModify and admits a write to them only through this subresource, so a
+# scheduler without it fails PreBind on the first claim-bearing pod even
+# though it holds every verb on the status itself.
+- apiGroups: ["resource.k8s.io"]
+  resources: ["resourceclaims/binding"]
+  verbs: ["update"]
+- apiGroups: [""]
+  resources: ["pods/finalizers"]
+  verbs: ["update"]
+{{- end }}
 - apiGroups: ["storage.k8s.io"]
   resources: ["csinodes", "storageclasses" , "csidrivers" , "csistoragecapacities", "volumeattachments"]
   verbs: ["get", "list", "watch"]
