@@ -1,0 +1,44 @@
+# Example KubeSchedulerConfiguration enabling CCXAlign as a second scheduler
+# for pods that opt in with schedulerName: dracpu-scheduler.
+# This configuration is documented as an example; Flux owns the live profile.
+#
+# DRAConsumableCapacity carries the capacity requests these claims are built
+# from. It is beta and on by default from 1.36, so the scheduler needs no
+# feature-gate argument for it; passing one sets a gate to the value it already
+# has. Deploying through the as-a-second-scheduler chart does need rbac.dra=true,
+# which grants the claim-writing verbs the in-tree DynamicResources plugin uses
+# to allocate at Reserve and PreBind.
+apiVersion: kubescheduler.config.k8s.io/v1
+kind: KubeSchedulerConfiguration
+leaderElection:
+  leaderElect: true
+profiles:
+  - schedulerName: dracpu-scheduler
+    percentageOfNodesToScore: 100
+    plugins:
+      # CCXAlign has to be listed here, not only under score: each extension
+      # point is populated from its own list, and only multiPoint expands a
+      # name to all of them. Enabled under score alone the plugin registers as
+      # a scorer whose PreFilter never ran, so it reads no cycle state.
+      multiPoint:
+        enabled:
+          - name: CCXAlign
+      # The weight belongs here: multiPoint cannot express one, and an explicit
+      # Score weight takes precedence over the multiPoint default.
+      score:
+        enabled:
+          - name: CCXAlign
+            # Heavier than the default scorers, so the alignment tiers decide
+            # between feasible nodes and the defaults only break ties.
+            weight: 10
+        disabled:
+          # Their differentials on a heterogeneous fleet are larger than the
+          # within-tier damage signal; claim-bearing pods do not want either.
+          - name: ImageLocality
+          - name: PodTopologySpread
+          - name: DynamicResources
+    pluginConfig:
+      - name: NodeResourcesFit
+        args:
+          scoringStrategy:
+            type: MostAllocated

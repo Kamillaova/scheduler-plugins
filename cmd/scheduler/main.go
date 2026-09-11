@@ -25,6 +25,7 @@ import (
 	"k8s.io/kubernetes/cmd/kube-scheduler/app"
 
 	"sigs.k8s.io/scheduler-plugins/pkg/capacityscheduling"
+	"sigs.k8s.io/scheduler-plugins/pkg/ccxalign"
 	"sigs.k8s.io/scheduler-plugins/pkg/coscheduling"
 	"sigs.k8s.io/scheduler-plugins/pkg/networkaware/networkoverhead"
 	"sigs.k8s.io/scheduler-plugins/pkg/networkaware/topologicalsort"
@@ -50,6 +51,7 @@ func main() {
 	// used by various kinds of workloads.
 	command := app.NewSchedulerCommand(
 		app.WithPlugin(capacityscheduling.Name, capacityscheduling.New),
+		app.WithPlugin(ccxalign.Name, ccxalign.New),
 		app.WithPlugin(coscheduling.Name, coscheduling.New),
 		app.WithPlugin(loadvariationriskbalancing.Name, loadvariationriskbalancing.New),
 		app.WithPlugin(networkoverhead.Name, networkoverhead.New),
