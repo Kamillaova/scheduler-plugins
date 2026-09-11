@@ -8,7 +8,7 @@ scheduler:
   command:
   - /bin/kube-scheduler
   replicaCount: 1
-  leaderElect: false
+  leaderElect: true
   priorityClassName: ""
   resources: {}
   nodeSelector: {}
