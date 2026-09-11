@@ -38,6 +38,7 @@ import (
 )
 
 var _ fwk.SharedLister = &fakeSharedLister{}
+var _ fwk.MutableSnapshotSharedLister = &fakeSharedLister{}
 
 type fakeSharedLister struct {
 	nodeInfos                                    []fwk.NodeInfo
@@ -100,6 +101,18 @@ func (f *fakeSharedLister) PodGroupStates() fwk.PodGroupStateLister {
 	return nil
 }
 
+func (f *fakeSharedLister) PodGroups() fwk.PodGroupLister {
+	return nil
+}
+
+func (f *fakeSharedLister) CompositePodGroupStates() fwk.CompositePodGroupStateLister {
+	return nil
+}
+
+func (f *fakeSharedLister) CompositePodGroups() fwk.CompositePodGroupLister {
+	return nil
+}
+
 func (f *fakeSharedLister) List() ([]fwk.NodeInfo, error) {
 	return f.nodeInfos, nil
 }
@@ -108,12 +121,32 @@ func (f *fakeSharedLister) HavePodsWithAffinityList() ([]fwk.NodeInfo, error) {
 	return f.havePodsWithAffinityNodeInfoList, nil
 }
 
+func (f *fakeSharedLister) HavePodsWithRequiredNonHostScopedAntiAffinityList() ([]fwk.NodeInfo, error) {
+	return nil, nil
+}
+
 func (f *fakeSharedLister) HavePodsWithRequiredAntiAffinityList() ([]fwk.NodeInfo, error) {
 	return f.havePodsWithRequiredAntiAffinityNodeInfoList, nil
 }
 
 func (f *fakeSharedLister) Get(nodeName string) (fwk.NodeInfo, error) {
 	return f.nodeInfoMap[nodeName], nil
+}
+
+func (f *fakeSharedLister) StartMutations() error {
+	return nil
+}
+
+func (f *fakeSharedLister) EndMutations() error {
+	return nil
+}
+
+func (f *fakeSharedLister) AddPod(podInfo fwk.PodInfo, nodeName string) error {
+	return nil
+}
+
+func (f *fakeSharedLister) RemovePod(logger klog.Logger, pod *v1.Pod, nodeName string) error {
+	return nil
 }
 
 /*

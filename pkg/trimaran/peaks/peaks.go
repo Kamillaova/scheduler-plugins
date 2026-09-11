@@ -192,5 +192,5 @@ func getPowerModel(nodeName string, powerModelMap map[string]config.PowerModel) 
 	if ok {
 		return powerModel
 	}
-	return config.PowerModel{0, 0, 0}
+	return config.PowerModel{}
 }

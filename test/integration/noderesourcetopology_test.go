@@ -101,7 +101,7 @@ func TestTopologyMatchPluginValidation(t *testing.T) {
 	})
 
 	cs := clientset.NewForConfigOrDie(globalKubeConfig)
-	informer := scheduler.NewInformerFactory(cs, 0)
+	informer := scheduler.NewInformerFactory(cs, 0, nil)
 	dynInformerFactory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(dynamic.NewForConfigOrDie(globalKubeConfig), 0, v1.NamespaceAll, nil)
 	eventBroadcaster := events.NewBroadcaster(&events.EventSinkImpl{
 		Interface: cs.EventsV1(),

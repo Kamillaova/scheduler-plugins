@@ -153,7 +153,7 @@ profiles:
 						},
 						{
 							Name: "VolumeBinding",
-							Args: &schedconfig.VolumeBindingArgs{BindTimeoutSeconds: 600},
+							Args: &schedconfig.VolumeBindingArgs{BindTimeoutSeconds: 600, Shape: []schedconfig.UtilizationShapePoint{{Utilization: 0, Score: 10}, {Utilization: 100, Score: 0}}},
 						},
 					},
 				},
@@ -229,7 +229,7 @@ profiles:
 						},
 						{
 							Name: "VolumeBinding",
-							Args: &schedconfig.VolumeBindingArgs{BindTimeoutSeconds: 600},
+							Args: &schedconfig.VolumeBindingArgs{BindTimeoutSeconds: 600, Shape: []schedconfig.UtilizationShapePoint{{Utilization: 0, Score: 10}, {Utilization: 100, Score: 0}}},
 						},
 					},
 				},
@@ -305,7 +305,7 @@ profiles:
 						},
 						{
 							Name: "VolumeBinding",
-							Args: &schedconfig.VolumeBindingArgs{BindTimeoutSeconds: 600},
+							Args: &schedconfig.VolumeBindingArgs{BindTimeoutSeconds: 600, Shape: []schedconfig.UtilizationShapePoint{{Utilization: 0, Score: 10}, {Utilization: 100, Score: 0}}},
 						},
 					},
 				},
@@ -378,7 +378,7 @@ profiles:
 						},
 						{
 							Name: "VolumeBinding",
-							Args: &schedconfig.VolumeBindingArgs{BindTimeoutSeconds: 600},
+							Args: &schedconfig.VolumeBindingArgs{BindTimeoutSeconds: 600, Shape: []schedconfig.UtilizationShapePoint{{Utilization: 0, Score: 10}, {Utilization: 100, Score: 0}}},
 						},
 					},
 				},

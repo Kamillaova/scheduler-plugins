@@ -19,8 +19,9 @@ package capacityscheduling
 import extenderv1 "k8s.io/kube-scheduler/extender/v1"
 
 type candidate struct {
-	victims *extenderv1.Victims
-	name    string
+	victims                *extenderv1.Victims
+	name                   string
+	numPodGroupDisruptions int
 }
 
 // Victims returns s.victims.
@@ -31,4 +32,8 @@ func (c *candidate) Victims() *extenderv1.Victims {
 // Name returns s.name.
 func (c *candidate) Name() string {
 	return c.name
+}
+
+func (c *candidate) NumPodGroupDisruptions() int {
+	return c.numPodGroupDisruptions
 }

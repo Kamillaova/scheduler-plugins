@@ -162,9 +162,9 @@ func TestQOSPluginSuite(t *testing.T) {
 		expectedOrder := []string{"guaranteed", "burstable", "bestefforts"}
 		actualOrder := make([]string, len(expectedOrder))
 		for i := 0; i < len(expectedOrder); i++ {
-			podInfo, _ := testCtx.Scheduler.NextPod(logger)
-			actualOrder[i] = podInfo.Pod.Name
-			t.Logf("Popped Pod %q", podInfo.Pod.Name)
+			entityInfo, _ := testCtx.Scheduler.NextEntity(logger)
+			actualOrder[i] = entityInfo.GetName()
+			t.Logf("Popped Pod %q", entityInfo.GetName())
 		}
 		if !reflect.DeepEqual(actualOrder, expectedOrder) {
 			t.Errorf("Expected Pod order %v, but got %v", expectedOrder, actualOrder)
@@ -268,9 +268,9 @@ func TestQOSPluginSuite(t *testing.T) {
 		expectedOrder := podNames
 		actualOrder := make([]string, len(expectedOrder))
 		for i := 0; i < len(expectedOrder); i++ {
-			podInfo, _ := testCtx.Scheduler.NextPod(logger)
-			actualOrder[i] = podInfo.Pod.Name
-			t.Logf("Popped Pod %q", podInfo.Pod.Name)
+			entityInfo, _ := testCtx.Scheduler.NextEntity(logger)
+			actualOrder[i] = entityInfo.GetName()
+			t.Logf("Popped Pod %q", entityInfo.GetName())
 		}
 		if !reflect.DeepEqual(actualOrder, expectedOrder) {
 			t.Errorf("Expected Pod order %v, but got %v", expectedOrder, actualOrder)

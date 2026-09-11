@@ -414,10 +414,7 @@ func autoConvert_config_NodeMetadataArgs_To_v1_NodeMetadataArgs(in *config.NodeM
 }
 
 func autoConvert_v1_NodeResourceTopologyCache_To_config_NodeResourceTopologyCache(in *NodeResourceTopologyCache, out *config.NodeResourceTopologyCache, s conversion.Scope) error {
-	out.ForeignPodsDetect = (*config.ForeignPodsDetectMode)(unsafe.Pointer(in.ForeignPodsDetect))
-	out.ResyncMethod = (*config.CacheResyncMethod)(unsafe.Pointer(in.ResyncMethod))
-	out.InformerMode = (*config.CacheInformerMode)(unsafe.Pointer(in.InformerMode))
-	out.ResyncScope = (*config.CacheResyncScope)(unsafe.Pointer(in.ResyncScope))
+	*out = *(*config.NodeResourceTopologyCache)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -427,10 +424,7 @@ func Convert_v1_NodeResourceTopologyCache_To_config_NodeResourceTopologyCache(in
 }
 
 func autoConvert_config_NodeResourceTopologyCache_To_v1_NodeResourceTopologyCache(in *config.NodeResourceTopologyCache, out *NodeResourceTopologyCache, s conversion.Scope) error {
-	out.ForeignPodsDetect = (*ForeignPodsDetectMode)(unsafe.Pointer(in.ForeignPodsDetect))
-	out.ResyncMethod = (*CacheResyncMethod)(unsafe.Pointer(in.ResyncMethod))
-	out.InformerMode = (*CacheInformerMode)(unsafe.Pointer(in.InformerMode))
-	out.ResyncScope = (*CacheResyncScope)(unsafe.Pointer(in.ResyncScope))
+	*out = *(*NodeResourceTopologyCache)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -506,9 +500,7 @@ func Convert_config_PeaksArgs_To_v1_PeaksArgs(in *config.PeaksArgs, out *PeaksAr
 }
 
 func autoConvert_v1_PowerModel_To_config_PowerModel(in *PowerModel, out *config.PowerModel, s conversion.Scope) error {
-	out.K0 = in.K0
-	out.K1 = in.K1
-	out.K2 = in.K2
+	*out = *(*config.PowerModel)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -518,9 +510,7 @@ func Convert_v1_PowerModel_To_config_PowerModel(in *PowerModel, out *config.Powe
 }
 
 func autoConvert_config_PowerModel_To_v1_PowerModel(in *config.PowerModel, out *PowerModel, s conversion.Scope) error {
-	out.K0 = in.K0
-	out.K1 = in.K1
-	out.K2 = in.K2
+	*out = *(*PowerModel)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -560,8 +550,7 @@ func Convert_config_PreemptionTolerationArgs_To_v1_PreemptionTolerationArgs(in *
 }
 
 func autoConvert_v1_ScoringStrategy_To_config_ScoringStrategy(in *ScoringStrategy, out *config.ScoringStrategy, s conversion.Scope) error {
-	out.Type = config.ScoringStrategyType(in.Type)
-	out.Resources = *(*[]apisconfig.ResourceSpec)(unsafe.Pointer(&in.Resources))
+	*out = *(*config.ScoringStrategy)(unsafe.Pointer(in))
 	return nil
 }
 
@@ -571,8 +560,7 @@ func Convert_v1_ScoringStrategy_To_config_ScoringStrategy(in *ScoringStrategy, o
 }
 
 func autoConvert_config_ScoringStrategy_To_v1_ScoringStrategy(in *config.ScoringStrategy, out *ScoringStrategy, s conversion.Scope) error {
-	out.Type = ScoringStrategyType(in.Type)
-	out.Resources = *(*[]configv1.ResourceSpec)(unsafe.Pointer(&in.Resources))
+	*out = *(*ScoringStrategy)(unsafe.Pointer(in))
 	return nil
 }
 

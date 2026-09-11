@@ -29,7 +29,7 @@ import (
 //
 // ElasticQuota sets elastic quota restrictions per namespace
 type ElasticQuotaApplyConfiguration struct {
-	v1.TypeMetaApplyConfiguration `json:",inline"`
+	v1.TypeMetaApplyConfiguration `json:""`
 	// Standard object's metadata.
 	*v1.ObjectMetaApplyConfiguration `json:"metadata,omitempty"`
 	// ElasticQuotaSpec defines the Min and Max for Quota.

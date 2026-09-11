@@ -63,12 +63,12 @@ func TestSortLess(t *testing.T) {
 		{
 			name: "p1 and p2 are both BestEfforts, but p2 is added to schedulingQ earlier than p1",
 			pInfo1: &framework.QueuedPodInfo{
-				PodInfo:   createPodInfo(makePod("p1", 0, nil, nil)),
-				Timestamp: laterTime,
+				PodInfo:        createPodInfo(makePod("p1", 0, nil, nil)),
+				QueueingParams: framework.QueueingParams{Timestamp: laterTime},
 			},
 			pInfo2: &framework.QueuedPodInfo{
-				PodInfo:   createPodInfo(makePod("p2", 0, nil, nil)),
-				Timestamp: earlierTime,
+				PodInfo:        createPodInfo(makePod("p2", 0, nil, nil)),
+				QueueingParams: framework.QueueingParams{Timestamp: earlierTime},
 			},
 			want: false,
 		},
@@ -95,12 +95,12 @@ func TestSortLess(t *testing.T) {
 		{
 			name: "both p1 and p2 are Burstable, but p2 is added to schedulingQ earlier than p1",
 			pInfo1: &framework.QueuedPodInfo{
-				PodInfo:   createPodInfo(makePod("p1", 0, getResList("100m", "100Mi"), getResList("200m", "200Mi"))),
-				Timestamp: laterTime,
+				PodInfo:        createPodInfo(makePod("p1", 0, getResList("100m", "100Mi"), getResList("200m", "200Mi"))),
+				QueueingParams: framework.QueueingParams{Timestamp: laterTime},
 			},
 			pInfo2: &framework.QueuedPodInfo{
-				PodInfo:   createPodInfo(makePod("p2", 0, getResList("100m", "100Mi"), getResList("200m", "200Mi"))),
-				Timestamp: earlierTime,
+				PodInfo:        createPodInfo(makePod("p2", 0, getResList("100m", "100Mi"), getResList("200m", "200Mi"))),
+				QueueingParams: framework.QueueingParams{Timestamp: earlierTime},
 			},
 			want: false,
 		},
@@ -117,24 +117,24 @@ func TestSortLess(t *testing.T) {
 		{
 			name: "both p1 and p2 are Guaranteed, but p1 is added to schedulingQ earlier than p2",
 			pInfo1: &framework.QueuedPodInfo{
-				PodInfo:   createPodInfo(makePod("p1", 0, getResList("100m", "100Mi"), getResList("100m", "100Mi"))),
-				Timestamp: earlierTime,
+				PodInfo:        createPodInfo(makePod("p1", 0, getResList("100m", "100Mi"), getResList("100m", "100Mi"))),
+				QueueingParams: framework.QueueingParams{Timestamp: earlierTime},
 			},
 			pInfo2: &framework.QueuedPodInfo{
-				PodInfo:   createPodInfo(makePod("p2", 0, getResList("100m", "100Mi"), getResList("100m", "100Mi"))),
-				Timestamp: laterTime,
+				PodInfo:        createPodInfo(makePod("p2", 0, getResList("100m", "100Mi"), getResList("100m", "100Mi"))),
+				QueueingParams: framework.QueueingParams{Timestamp: laterTime},
 			},
 			want: true,
 		},
 		{
 			name: "both p1 and p2 are Guaranteed, but p1 is added to schedulingQ earlier than p2",
 			pInfo1: &framework.QueuedPodInfo{
-				PodInfo:   createPodInfo(makePod("p1", 0, getResList("100m", "100Mi"), getResList("100m", "100Mi"))),
-				Timestamp: earlierTime,
+				PodInfo:        createPodInfo(makePod("p1", 0, getResList("100m", "100Mi"), getResList("100m", "100Mi"))),
+				QueueingParams: framework.QueueingParams{Timestamp: earlierTime},
 			},
 			pInfo2: &framework.QueuedPodInfo{
-				PodInfo:   createPodInfo(makePod("p2", 0, getResList("100m", "100Mi"), getResList("100m", "100Mi"))),
-				Timestamp: laterTime,
+				PodInfo:        createPodInfo(makePod("p2", 0, getResList("100m", "100Mi"), getResList("100m", "100Mi"))),
+				QueueingParams: framework.QueueingParams{Timestamp: laterTime},
 			},
 			want: true,
 		},

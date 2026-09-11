@@ -25,7 +25,6 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/tools/cache"
-	corev1helpers "k8s.io/component-helpers/scheduling/corev1"
 	"k8s.io/klog/v2"
 	fwk "k8s.io/kube-scheduler/framework"
 	"sigs.k8s.io/scheduler-plugins/apis/config"
@@ -130,16 +129,31 @@ func (cs *Coscheduling) Name() string {
 // 1. Compare the priorities of Pods.
 // 2. Compare the initialization timestamps of PodGroups or Pods.
 // 3. Compare the keys of PodGroups/Pods: <namespace>/<podname>.
-func (cs *Coscheduling) Less(podInfo1, podInfo2 fwk.QueuedPodInfo) bool {
-	prio1 := corev1helpers.PodPriority(podInfo1.GetPodInfo().GetPod())
-	prio2 := corev1helpers.PodPriority(podInfo2.GetPodInfo().GetPod())
+func (cs *Coscheduling) Less(podInfo1, podInfo2 fwk.QueuedEntityInfo) bool {
+	prio1 := podInfo1.GetPriority()
+	prio2 := podInfo2.GetPriority()
 	if prio1 != prio2 {
 		return prio1 > prio2
 	}
-	creationTime1 := cs.pgMgr.GetCreationTimestamp(context.TODO(), podInfo1.GetPodInfo().GetPod(), *podInfo1.GetInitialAttemptTimestamp())
-	creationTime2 := cs.pgMgr.GetCreationTimestamp(context.TODO(), podInfo2.GetPodInfo().GetPod(), *podInfo2.GetInitialAttemptTimestamp())
+	pod1 := util.GetPodFromEntity(podInfo1)
+	pod2 := util.GetPodFromEntity(podInfo2)
+	if pod1 == nil || pod2 == nil {
+		return podInfo1.GetTimestamp().Before(podInfo2.GetTimestamp())
+	}
+	t1 := podInfo1.GetInitialAttemptTimestamp()
+	if t1 == nil {
+		ts := podInfo1.GetTimestamp()
+		t1 = &ts
+	}
+	t2 := podInfo2.GetInitialAttemptTimestamp()
+	if t2 == nil {
+		ts := podInfo2.GetTimestamp()
+		t2 = &ts
+	}
+	creationTime1 := cs.pgMgr.GetCreationTimestamp(context.TODO(), pod1, *t1)
+	creationTime2 := cs.pgMgr.GetCreationTimestamp(context.TODO(), pod2, *t2)
 	if creationTime1.Equal(creationTime2) {
-		return core.GetNamespacedName(podInfo1.GetPodInfo().GetPod()) < core.GetNamespacedName(podInfo2.GetPodInfo().GetPod())
+		return core.GetNamespacedName(pod1) < core.GetNamespacedName(pod2)
 	}
 	return creationTime1.Before(creationTime2)
 }

@@ -34,11 +34,39 @@ import (
 )
 
 // ElasticQuotaInformer provides access to a shared informer and lister for
-// ElasticQuotas.
+// ElasticQuotas. Prefer using the type-safe variant (see [TypedElasticQuotaInformer]).
 type ElasticQuotaInformer interface {
 	Informer() cache.SharedIndexInformer
 	Lister() schedulingv1alpha1.ElasticQuotaLister
 }
+
+// TypedElasticQuotaInformer provides access to a shared informer and lister for
+// ElasticQuotas, including the type-safe TypedInformer variant.
+// It is a superset of ElasticQuotaInformer.
+type TypedElasticQuotaInformer interface {
+	Informer() cache.SharedIndexInformer
+	TypedInformer() ElasticQuotaIndexInformer
+	Lister() schedulingv1alpha1.ElasticQuotaLister
+}
+
+// ElasticQuotaIndexInformer is a wrapper around the underlying [cache.SharedIndexInformer]
+// with type-safe variants of several methods.
+type ElasticQuotaIndexInformer cache.TypedSharedIndexInformer[*apisschedulingv1alpha1.ElasticQuota]
+
+// ElasticQuotaHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerFuncs] for ElasticQuota.
+type ElasticQuotaHandlerFuncs = cache.TypedResourceEventHandlerFuncs[*apisschedulingv1alpha1.ElasticQuota]
+
+// ElasticQuotaDetailedHandlerFuncs is a specialization of [cache.TypedResourceEventHandlerDetailedFuncs] for ElasticQuota.
+type ElasticQuotaDetailedHandlerFuncs = cache.TypedResourceEventHandlerDetailedFuncs[*apisschedulingv1alpha1.ElasticQuota]
+
+// ElasticQuotaFilteringHandler is a specialization of [cache.TypedFilteringResourceEventHandler] for ElasticQuota.
+type ElasticQuotaFilteringHandler = cache.TypedFilteringResourceEventHandler[*apisschedulingv1alpha1.ElasticQuota]
+
+// ElasticQuotaIndexers is a specialization of [cache.TypedIndexers] for ElasticQuota.
+type ElasticQuotaIndexers = cache.TypedIndexers[*apisschedulingv1alpha1.ElasticQuota]
+
+// DeletedElasticQuota is a specialization of [cache.DeletedObject] for ElasticQuota.
+type DeletedElasticQuota = cache.DeletedObject[*apisschedulingv1alpha1.ElasticQuota]
 
 type elasticQuotaInformer struct {
 	factory          internalinterfaces.SharedInformerFactory
@@ -49,25 +77,49 @@ type elasticQuotaInformer struct {
 // NewElasticQuotaInformer constructs a new informer for ElasticQuota type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedElasticQuotaInformer]).
 func NewElasticQuotaInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers) cache.SharedIndexInformer {
 	return NewElasticQuotaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers})
+}
+
+// NewTypedElasticQuotaInformer constructs a new informer for ElasticQuota type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedElasticQuotaInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers ElasticQuotaIndexers) ElasticQuotaIndexInformer {
+	return NewTypedElasticQuotaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers)})
 }
 
 // NewFilteredElasticQuotaInformer constructs a new informer for ElasticQuota type.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedFilteredElasticQuotaInformer]).
 func NewFilteredElasticQuotaInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers cache.Indexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) cache.SharedIndexInformer {
-	return NewElasticQuotaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+	return NewTypedElasticQuotaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: indexers, TweakListOptions: tweakListOptions})
+}
+
+// NewTypedFilteredElasticQuotaInformer constructs a new informer for ElasticQuota type.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedFilteredElasticQuotaInformer(client versioned.Interface, namespace string, resyncPeriod time.Duration, indexers ElasticQuotaIndexers, tweakListOptions internalinterfaces.TweakListOptionsFunc) ElasticQuotaIndexInformer {
+	return NewTypedElasticQuotaInformerWithOptions(client, namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.TypedIndexersToIndexers(indexers), TweakListOptions: tweakListOptions})
 }
 
 // NewElasticQuotaInformerWithOptions constructs a new informer for ElasticQuota type with additional options.
 // Always prefer using an informer factory to get a shared informer instead of getting an independent
 // one. This reduces memory footprint and number of connections to the server.
+// If you really need an independent one, prefer using the type-safe variant (see [NewTypedElasticQuotaInformerWithOptions]).
 func NewElasticQuotaInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) cache.SharedIndexInformer {
+	return NewTypedElasticQuotaInformerWithOptions(client, namespace, options)
+}
+
+// NewTypedElasticQuotaInformerWithOptions constructs a new informer for ElasticQuota type with additional options.
+// Always prefer using an informer factory to get a shared informer instead of getting an independent
+// one. This reduces memory footprint and number of connections to the server.
+func NewTypedElasticQuotaInformerWithOptions(client versioned.Interface, namespace string, options internalinterfaces.InformerOptions) ElasticQuotaIndexInformer {
 	gvr := schema.GroupVersionResource{Group: "scheduling.x-k8s.io", Version: "v1alpha1", Resource: "elasticquotas"}
 	identifier := options.InformerName.WithResource(gvr)
 	tweakListOptions := options.TweakListOptions
-	return cache.NewSharedIndexInformerWithOptions(
+	return cache.NewTypedSharedIndexInformer[*apisschedulingv1alpha1.ElasticQuota](cache.NewSharedIndexInformerWithOptions(
 		cache.ToListWatcherWithWatchListSemantics(&cache.ListWatch{
 			ListFunc: func(opts v1.ListOptions) (runtime.Object, error) {
 				if tweakListOptions != nil {
@@ -100,17 +152,57 @@ func NewElasticQuotaInformerWithOptions(client versioned.Interface, namespace st
 			Indexers:     options.Indexers,
 			Identifier:   identifier,
 		},
-	)
+	))
 }
 
 func (f *elasticQuotaInformer) defaultInformer(client versioned.Interface, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	return NewElasticQuotaInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
+	return NewTypedElasticQuotaInformerWithOptions(client, f.namespace, internalinterfaces.InformerOptions{ResyncPeriod: resyncPeriod, Indexers: cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc}, InformerName: f.factory.InformerName(), TweakListOptions: f.tweakListOptions})
 }
 
 func (f *elasticQuotaInformer) Informer() cache.SharedIndexInformer {
-	return f.factory.InformerFor(&apisschedulingv1alpha1.ElasticQuota{}, f.defaultInformer)
+	return f.TypedInformer()
+}
+
+func (f *elasticQuotaInformer) TypedInformer() ElasticQuotaIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apisschedulingv1alpha1.ElasticQuota](f.factory.InformerFor(&apisschedulingv1alpha1.ElasticQuota{}, f.defaultInformer))
 }
 
 func (f *elasticQuotaInformer) Lister() schedulingv1alpha1.ElasticQuotaLister {
 	return schedulingv1alpha1.NewElasticQuotaLister(f.Informer().GetIndexer())
+}
+
+// ToTypedElasticQuotaInformer converts an untyped informer into a TypedElasticQuotaInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ElasticQuota. If that is not the case, calling type-safe methods of the returned
+// TypedElasticQuotaInformer leads to runtime panics. A safer alternative is to pass
+// around a TypedElasticQuotaInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToTypedElasticQuotaInformer(informer ElasticQuotaInformer) TypedElasticQuotaInformer {
+	if informer, ok := informer.(TypedElasticQuotaInformer); ok {
+		return informer
+	}
+	return &elasticQuotaTypedInformerAdapter{informer}
+}
+
+type elasticQuotaTypedInformerAdapter struct {
+	ElasticQuotaInformer
+}
+
+func (a *elasticQuotaTypedInformerAdapter) TypedInformer() ElasticQuotaIndexInformer {
+	return cache.NewTypedSharedIndexInformer[*apisschedulingv1alpha1.ElasticQuota](a.Informer())
+}
+
+// ToElasticQuotaIndexInformer converts an untyped informer into a ElasticQuotaIndexInformer.
+//
+// WARNING: this conversion is only safe if the informer handles objects of type
+// *ElasticQuota. If that is not the case, calling type-safe methods of the returned
+// ElasticQuotaIndexInformer leads to runtime panics. A safer alternative is to pass
+// around a ElasticQuotaIndexInformer instances that was obtained from a
+// SharedInformerFactory.
+func ToElasticQuotaIndexInformer(informer cache.SharedIndexInformer) ElasticQuotaIndexInformer {
+	if informer, ok := informer.(ElasticQuotaIndexInformer); ok {
+		return informer
+	}
+	return cache.NewTypedSharedIndexInformer[*apisschedulingv1alpha1.ElasticQuota](informer)
 }

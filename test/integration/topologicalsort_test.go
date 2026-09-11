@@ -388,11 +388,11 @@ func TestTopologicalSortPlugin(t *testing.T) {
 			t.Logf("Step 4 -  Expect pods to be popped out according to the topologicalSort plugin...")
 			logger := klog.FromContext(testCtx.Ctx)
 			for i := 0; i < len(tt.podNames); i++ {
-				podInfo, _ := testCtx.Scheduler.NextPod(logger)
-				if podInfo.Pod.Name != tt.podNames[i] {
-					t.Errorf("Expect Pod %q, but got %q", tt.podNames[i], podInfo.Pod.Name)
+				entityInfo, _ := testCtx.Scheduler.NextEntity(logger)
+				if entityInfo.GetName() != tt.podNames[i] {
+					t.Errorf("Expect Pod %q, but got %q", tt.podNames[i], entityInfo.GetName())
 				} else {
-					t.Logf("Pod %q is popped out as expected.", podInfo.Pod.Name)
+					t.Logf("Pod %q is popped out as expected.", entityInfo.GetName())
 				}
 			}
 		})

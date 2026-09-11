@@ -235,7 +235,7 @@ func TestPostFilter(t *testing.T) {
 				},
 			},
 			wantResult: framework.NewPostFilterResultWithNominatedNode("node-a"),
-			wantStatus: fwk.NewStatus(fwk.Success),
+			wantStatus: fwk.NewStatus(fwk.Success, "found a potential placement for pod on node node-a, preempting 1 victims"),
 		},
 		{
 			name: "cross-namespace preemption",
@@ -276,7 +276,7 @@ func TestPostFilter(t *testing.T) {
 				},
 			},
 			wantResult: framework.NewPostFilterResultWithNominatedNode("node-a"),
-			wantStatus: fwk.NewStatus(fwk.Success),
+			wantStatus: fwk.NewStatus(fwk.Success, "found a potential placement for pod on node node-a, preempting 1 victims"),
 		},
 		{
 			name: "without elasticQuotas",
@@ -292,7 +292,7 @@ func TestPostFilter(t *testing.T) {
 			filteredNodesReader: makeUnschedulableNodeStatusReader(),
 			elasticQuotas:       map[string]*ElasticQuotaInfo{},
 			wantResult:          framework.NewPostFilterResultWithNominatedNode("node-a"),
-			wantStatus:          fwk.NewStatus(fwk.Success),
+			wantStatus:          fwk.NewStatus(fwk.Success, "found a potential placement for pod on node node-a, preempting 1 victims"),
 		},
 	}
 
@@ -317,6 +317,7 @@ func TestPostFilter(t *testing.T) {
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
 
+			snapshot := testutil.NewFakeSharedLister(tt.existPods, tt.nodes)
 			fwk, err := tf.NewFramework(
 				ctx,
 				registeredPlugins,
@@ -325,7 +326,8 @@ func TestPostFilter(t *testing.T) {
 				frameworkruntime.WithEventRecorder(&events.FakeRecorder{}),
 				frameworkruntime.WithInformerFactory(informerFactory),
 				frameworkruntime.WithPodNominator(testutil.NewPodNominator(informerFactory.Core().V1().Pods().Lister())),
-				frameworkruntime.WithSnapshotSharedLister(testutil.NewFakeSharedLister(tt.existPods, tt.nodes)),
+				frameworkruntime.WithSnapshotSharedLister(snapshot),
+				frameworkruntime.WithMutableSnapshotLister(snapshot.(fwk.MutableSnapshotSharedLister)),
 				frameworkruntime.WithWaitingPods(frameworkruntime.NewWaitingPodsMap()),
 				frameworkruntime.WithPodsInPreBind(frameworkruntime.NewPodsInPreBindMap()),
 			)
@@ -724,6 +726,7 @@ func TestDryRunPreemption(t *testing.T) {
 			cs := clientsetfake.NewSimpleClientset()
 			ctx, cancel := context.WithCancel(context.Background())
 			defer cancel()
+			snapshot := testutil.NewFakeSharedLister(tt.pods, tt.nodes)
 			fwk, err := tf.NewFramework(
 				ctx,
 				registeredPlugins,
@@ -731,7 +734,8 @@ func TestDryRunPreemption(t *testing.T) {
 				frameworkruntime.WithClientSet(cs),
 				frameworkruntime.WithEventRecorder(&events.FakeRecorder{}),
 				frameworkruntime.WithPodNominator(testutil.NewPodNominator(nil)),
-				frameworkruntime.WithSnapshotSharedLister(testutil.NewFakeSharedLister(tt.pods, tt.nodes)),
+				frameworkruntime.WithSnapshotSharedLister(snapshot),
+				frameworkruntime.WithMutableSnapshotLister(snapshot.(fwk.MutableSnapshotSharedLister)),
 				frameworkruntime.WithInformerFactory(informers.NewSharedInformerFactory(cs, 0)),
 			)
 			if err != nil {

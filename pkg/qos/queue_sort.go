@@ -21,9 +21,9 @@ import (
 
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/runtime"
-	corev1helpers "k8s.io/component-helpers/scheduling/corev1"
 	fwk "k8s.io/kube-scheduler/framework"
 	v1qos "k8s.io/kubernetes/pkg/apis/core/v1/helper/qos"
+	"sigs.k8s.io/scheduler-plugins/pkg/util"
 )
 
 // Name is the name of the plugin used in the plugin registry and configurations.
@@ -43,16 +43,20 @@ func (pl *Sort) Name() string {
 // It sorts pods based on their priorities. When the priorities are equal, it uses
 // the Pod QoS classes to break the tie. If both the priority and QoS class are equal,
 // it uses PodQueueInfo.timestamp to determine the order.
-func (*Sort) Less(pInfo1, pInfo2 fwk.QueuedPodInfo) bool {
-	p1 := corev1helpers.PodPriority(pInfo1.GetPodInfo().GetPod())
-	p2 := corev1helpers.PodPriority(pInfo2.GetPodInfo().GetPod())
+func (*Sort) Less(pInfo1, pInfo2 fwk.QueuedEntityInfo) bool {
+	p1 := pInfo1.GetPriority()
+	p2 := pInfo2.GetPriority()
 
 	if p1 != p2 {
 		return p1 > p2
 	}
-	qosResult := compQOS(pInfo1.GetPodInfo().GetPod(), pInfo2.GetPodInfo().GetPod())
-	if qosResult != 0 {
-		return qosResult > 0
+	pod1 := util.GetPodFromEntity(pInfo1)
+	pod2 := util.GetPodFromEntity(pInfo2)
+	if pod1 != nil && pod2 != nil {
+		qosResult := compQOS(pod1, pod2)
+		if qosResult != 0 {
+			return qosResult > 0
+		}
 	}
 	return pInfo1.GetTimestamp().Before(pInfo2.GetTimestamp())
 }
